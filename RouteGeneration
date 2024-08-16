@@ -1,1 +1,132 @@
+#include <iostream>
+#include <vector>
+#include <queue>
+#include <limits>
+#include <algorithm>
+
+#define GRID_SIZE 10
+
+// Directions for movement: right, down, left, up
+const int directions[4][2] = {{0, 1}, {1, 0}, {0, -1}, {-1, 0}};
+const std::string direction_names[4] = {"Right", "Down", "Left", "Up"};
+
+// Node structure for Dijkstra's algorithm
+struct Node {
+    int x, y;
+    int cost;
+    Node* parent;
+
+    Node(int x, int y, int cost, Node* parent)
+        : x(x), y(y), cost(cost), parent(parent) {}
+
+    bool operator>(const Node& other) const {
+        return cost > other.cost;
+    }
+};
+
+// Function to check if a position is within the grid and walkable
+bool is_valid(int x, int y, const std::vector<std::vector<int>>& grid) {
+    return x >= 0 && x < GRID_SIZE && y >= 0 && y < GRID_SIZE && grid[x][y] == 0;
+}
+
+// Dijkstra's Pathfinding algorithm
+std::vector<std::pair<int, int>> dijkstra(const std::vector<std::vector<int>>& grid, std::pair<int, int> start, std::pair<int, int> goal) {
+    std::priority_queue<Node, std::vector<Node>, std::greater<>> open_set;
+    std::vector<std::vector<int>> dist(GRID_SIZE, std::vector<int>(GRID_SIZE, std::numeric_limits<int>::max()));
+    std::vector<std::vector<bool>> closed_set(GRID_SIZE, std::vector<bool>(GRID_SIZE, false));
+
+    Node* start_node = new Node(start.first, start.second, 0, nullptr);
+    open_set.push(*start_node);
+    dist[start.first][start.second] = 0;
+
+    while (!open_set.empty()) {
+        Node current = open_set.top();
+        open_set.pop();
+
+        if (current.x == goal.first && current.y == goal.second) {
+            // Path found
+            std::vector<std::pair<int, int>> path;
+            Node* path_node = &current;
+            while (path_node) {
+                path.push_back({path_node->x, path_node->y});
+                path_node = path_node->parent;
+            }
+            std::reverse(path.begin(), path.end());
+            return path;
+        }
+
+        closed_set[current.x][current.y] = true;
+
+        for (int i = 0; i < 4; ++i) {
+            int new_x = current.x + directions[i][0];
+            int new_y = current.y + directions[i][1];
+
+            if (is_valid(new_x, new_y, grid) && !closed_set[new_x][new_y]) {
+                int new_cost = current.cost + 1;
+                if (new_cost < dist[new_x][new_y]) {
+                    dist[new_x][new_y] = new_cost;
+                    Node* neighbor = new Node(new_x, new_y, new_cost, new Node(current.x, current.y, current.cost, current.parent));
+                    open_set.push(*neighbor);
+                }
+            }
+        }
+    }
+
+    return {}; // No path found
+}
+
+// Generate navigation instructions based on the path
+std::vector<std::string> generate_instructions(const std::vector<std::pair<int, int>>& path) {
+    std::vector<std::string> instructions;
+
+    if (path.size() < 2) return instructions;
+
+    for (size_t i = 1; i < path.size(); ++i) {
+        int dx = path[i].first - path[i - 1].first;
+        int dy = path[i].second - path[i - 1].second;
+
+        if (dx == 1 && dy == 0)
+            instructions.push_back("Move Down");
+        else if (dx == -1 && dy == 0)
+            instructions.push_back("Move Up");
+        else if (dx == 0 && dy == 1)
+            instructions.push_back("Move Right");
+        else if (dx == 0 && dy == -1)
+            instructions.push_back("Move Left");
+    }
+
+    return instructions;
+}
+
+int main() {
+    std::vector<std::vector<int>> grid = {
+        {0, 0, 0, 0, 1, 0, 0, 0, 0, 0},
+        {0, 1, 1, 0, 1, 0, 1, 0, 1, 0},
+        {0, 1, 0, 0, 0, 0, 1, 0, 1, 0},
+        {0, 1, 0, 1, 1, 0, 1, 0, 1, 0},
+        {0, 0, 0, 0, 1, 0, 0, 0, 0, 0},
+        {0, 1, 1, 1, 1, 0, 1, 1, 0, 0},
+        {0, 1, 0, 0, 0, 0, 0, 0, 1, 0},
+        {0, 1, 0, 1, 1, 1, 1, 0, 1, 0},
+        {0, 0, 0, 0, 0, 0, 1, 0, 1, 0},
+        {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+    };
+
+    std::pair<int, int> start = {0, 0};
+    std::pair<int, int> goal = {9, 9};
+
+    std::vector<std::pair<int, int>> path = dijkstra(grid, start, goal);
+
+    if (path.empty()) {
+        std::cout << "No path found" << std::endl;
+    } else {
+        std::cout << "Path found:" << std::endl;
+        std::vector<std::string> instructions = generate_instructions(path);
+        for (const auto& instruction : instructions) {
+            std::cout << instruction << std::endl;
+        }
+    }
+
+    return 0;
+}
 
