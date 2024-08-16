@@ -1,30 +1,34 @@
-import speech_recognition as sr
+#convert text to speach 
 
-# Initialize the recognizer
-r = sr.Recognizer()
 
-# Function to convert speech to text
-def speech_to_text():
-    # Use the microphone as the source for input
-    with sr.Microphone() as source:
-        print("Adjusting for ambient noise, please wait...")
-        # Adjust the recognizer sensitivity to ambient noise level
-        r.adjust_for_ambient_noise(source, duration=0.5)
-        print("Listening...")
+import pyttsx3
 
-        # Listen for user input
-        audio = r.listen(source)
+def speak_directions(directions):
+    # Initialize the text-to-speech engine
+    engine = pyttsx3.init()
 
-        try:
-            # Use Google's speech recognition
-            text = r.recognize_google(audio)
-            text = text.lower()
-            print("You said: " + text)
-        except sr.RequestError:
-            print("API unavailable or unresponsive")
-        except sr.UnknownValueError:
-            print("Unable to recognize speech")
+    # Set the properties of the voice (optional)
+    rate = engine.getProperty('rate')   # Speed of speech
+    engine.setProperty('rate', 150)     # 150 words per minute
+    volume = engine.getProperty('volume')  # Volume level (0.0 to 1.0)
+    engine.setProperty('volume', 1.0)    # 100% volume
 
-# Run the function
-speech_to_text()
+    # Speaking each direction
+    for direction in directions:
+        if direction == 'Right':
+            engine.say("Go right.")
+        elif direction == 'Left':
+            engine.say("Go left.")
+        elif direction == 'Down':
+            engine.say("Go straight.")
+        elif direction == 'Up':
+            engine.say("Go back.")
 
+    # Wait for the speaking to finish
+    engine.runAndWait()
+
+# Sample directions
+directions = ['Right', 'Right', 'Down', 'Down', 'Right', 'Left', 'Right']
+
+# Call the function to speak the directions
+speak_directions(directions)
