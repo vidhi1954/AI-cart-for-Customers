@@ -1,0 +1,68 @@
+HARDWARE SETUP:
+LDR Sensor: Connect one side of the LDR to the analog pin (A0) and the other side to the ground. Add a pull-down resistor (10kΩ) between the analog pin and ground.
+Ultrasonic Sensor: Connect the trigger pin to digital pin 9 and the echo pin to digital pin 10. Ensure the sensor’s VCC and GND are connected to the Arduino's power and ground.
+Microphone Sensor: Connect the output of the microphone to the analog pin (A1). The VCC and GND of the microphone should be connected to the Arduino's power and ground.
+
+
+
+
+// LDR Sensor Code
+const int ldrPin = A0; // Analog pin where LDR is connected
+int ldrValue = 0; // Variable to store LDR reading
+
+void setup() {
+  Serial.begin(9600); // Initialize serial communication
+}
+
+void loop() {
+  ldrValue = analogRead(ldrPin); // Read LDR value
+  Serial.print("LDR Value: ");
+  Serial.println(ldrValue); // Print the LDR value
+  delay(1000); // Wait for a second
+}
+
+
+
+// Ultrasonic Sensor Code
+const int trigPin = 9; // Pin for the trigger
+const int echoPin = 10; // Pin for the echo
+long duration;
+int distance;
+
+void setup() {
+  pinMode(trigPin, OUTPUT);
+  pinMode(echoPin, INPUT);
+  Serial.begin(9600);
+}
+
+void loop() {
+  digitalWrite(trigPin, LOW);
+  delayMicroseconds(2);
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPin, LOW);
+  
+  duration = pulseIn(echoPin, HIGH);
+  distance = duration * 0.0344 / 2; // Convert duration to distance in cm
+  
+  Serial.print("Distance: ");
+  Serial.print(distance);
+  Serial.println(" cm");
+  delay(1000); // Wait for a second
+}
+
+
+// Microphone Sensor Code
+const int micPin = A1; // Analog pin where the microphone is connected
+int micValue = 0; // Variable to store microphone reading
+
+void setup() {
+  Serial.begin(9600); // Initialize serial communication
+}
+
+void loop() {
+  micValue = analogRead(micPin); // Read microphone value
+  Serial.print("Microphone Value: ");
+  Serial.println(micValue); // Print the microphone value
+  delay(1000); // Wait for a second
+}
