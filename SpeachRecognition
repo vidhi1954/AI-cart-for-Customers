@@ -1,0 +1,29 @@
+import speech_recognition as sr
+
+# Initialize the recognizer
+r = sr.Recognizer()
+
+# Function to convert speech to text
+def speech_to_text():
+    # Use the microphone as the source for input
+    with sr.Microphone() as source:
+        print("Adjusting for ambient noise, please wait...")
+        # Adjust the recognizer sensitivity to ambient noise level
+        r.adjust_for_ambient_noise(source, duration=0.5)
+        print("Listening...")
+
+        # Listen for user input
+        audio = r.listen(source)
+
+        try:
+            # Use Google's speech recognition
+            text = r.recognize_google(audio)
+            text = text.lower()
+            print("You said: " + text)
+        except sr.RequestError:
+            print("API unavailable or unresponsive")
+        except sr.UnknownValueError:
+            print("Unable to recognize speech")
+
+# Run the function
+speech_to_text()
