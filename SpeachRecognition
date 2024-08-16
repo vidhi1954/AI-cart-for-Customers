@@ -28,35 +28,3 @@ def speech_to_text():
 # Run the function
 speech_to_text()
 
-
-
-
-import spacy
-
-# Load spaCy's pre-trained model
-nlp = spacy.load("en_core_web_sm")
-
-# Sample user inputs
-user_requests = [
-    "I need a MacBook Pro and an iPhone.",
-    "Looking for a pair of Nike shoes and an Adidas tracksuit.",
-    "Please add a Samsung Galaxy and a Dell XPS laptop to my order.",
-    "I want a Sony camera and Bose headphones."
-]
-
-def extract_products(requests):
-    product_list = []
-    for request in requests:
-        doc = nlp(request)
-        # Extract product names based on named entities or custom rules
-        products = [ent.text for ent in doc.ents if ent.label_ in ["PRODUCT", "ORG"]]
-        product_list.append(products)
-    return product_list
-
-# Process the list of user requests
-processed_products = extract_products(user_requests)
-
-# Display the extracted products
-for idx, products in enumerate(processed_products):
-    print(f"User request {idx + 1}: {products}")
-//nlp code
